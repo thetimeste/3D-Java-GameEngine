@@ -17,19 +17,22 @@ public class MainGameLoop {
 		Loader loader = new Loader();
 		Renderer renderer = new Renderer();
 		
-		//OpenGL vertices defined counter clockwise by default
+		//OpenGL vertices counterclockwise (two triangles that shapes a rectangle)
 		float[] vertices = {
 				//left bottom triangle
-				-0.5f,0.5f,0f,
-				-0.5f,-0.5f,0f,
-				0.5f,-0.5f,0f,
-				//right top triangle
-				0.5f,-0.5f,0f,
-				0.5f,0.5f,0f,
-				-0.5f,0.5f,0f
+				-0.5f,0.5f,0f, 	//v0
+				-0.5f,-0.5f,0f,	//v1
+				0.5f,-0.5f,0f, 	//v2
+				0.5f,0.5f,0f,	//v4
+
 		};
 		
-		RawModel model = loader.loadToVAO(vertices);
+		int [] indices = {
+				0,1,3,
+				1,2,3
+		};
+		
+		RawModel model = loader.loadToVAO(vertices,indices);
 		//main game loop (loops until window is not closed)
 		while(!Display.isCloseRequested()) {
 			renderer.prepare();
