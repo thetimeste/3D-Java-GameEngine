@@ -6,6 +6,7 @@ import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.RawModel;
 import renderEngine.Renderer;
+import shaders.StaticShader;
 
 
 public class MainGameLoop {
@@ -16,6 +17,7 @@ public class MainGameLoop {
 		
 		Loader loader = new Loader();
 		Renderer renderer = new Renderer();
+		StaticShader shader = new StaticShader();
 		
 		//OpenGL vertices counterclockwise (two triangles that shapes a rectangle)
 		float[] vertices = {
@@ -36,15 +38,18 @@ public class MainGameLoop {
 		//main game loop (loops until window is not closed)
 		while(!Display.isCloseRequested()) {
 			renderer.prepare();
-			//render
+			shader.start();
 			renderer.render(model);
+			shader.stop();
 			DisplayManager.updateDisplay();
 		}
 		
-		//close display
-		DisplayManager.closeDisplay();
+		//shader cleanup
+		shader.cleanUp();
 		//cleanup loader
 		loader.cleanUp();
+		//close display
+		DisplayManager.closeDisplay();
 	}
 
 }
