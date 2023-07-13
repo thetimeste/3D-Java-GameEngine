@@ -1,4 +1,4 @@
-package renderEngine;
+package models;
 
 public class RawModel {
 	//stores VAO in memory
