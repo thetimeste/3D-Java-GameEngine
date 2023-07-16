@@ -3,9 +3,13 @@ package shaders;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.FloatBuffer;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 public abstract class ShaderProgram {
 	
@@ -14,9 +18,12 @@ public abstract class ShaderProgram {
 	//the fragmentshader is computed once for each pixel
 	//the fragmentshader is a mix of the values r,g,b based on the distance of the pixel in relation to each vertex.
 	
+	//(shader program working scheme): model data in vao -> vertex shader -> per vertex variables -> fragment shader -> pixel color
+	
 	private int programID;
 	private int vertexShaderID;
 	private int fragmentShaderID;
+	private static FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16); //4x4 buffer
 	
 	public ShaderProgram(String vertexFile,String fragmentFile){
 		vertexShaderID = loadShader(vertexFile,GL20.GL_VERTEX_SHADER);
@@ -27,7 +34,36 @@ public abstract class ShaderProgram {
 		bindAttributes();
 		GL20.glLinkProgram(programID);
 		GL20.glValidateProgram(programID);
+		getAllUniformLocations();
 	}
+	
+	protected void loadFloat(int location, float value) {
+		GL20.glUniform1f(location, value);
+	}
+	
+	protected void loadVector(int location, Vector3f vector) {
+		GL20.glUniform3f(location, vector.x,vector.y,vector.z);
+	}
+	
+	protected void loadBoolean(int location, boolean value) {
+		float toLoad = 0;
+		if(value) {
+			toLoad = 1;
+		}
+		GL20.glUniform1f(location, toLoad);
+	}
+	
+	protected void loadMatrix(int location, Matrix4f matrix) {
+		matrix.store(matrixBuffer);
+		matrixBuffer.flip();
+		GL20.glUniformMatrix4(location, false, matrixBuffer);
+	}
+	
+	protected int getUniformLocation(String uniformName) {
+		return GL20.glGetUniformLocation(programID, uniformName);
+	}
+	
+	protected abstract void getAllUniformLocations();
 	
 	public void start(){
 		GL20.glUseProgram(programID);
